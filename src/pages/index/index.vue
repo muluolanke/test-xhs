@@ -1,10 +1,6 @@
 <template>
 	<view class="content">
-		<!-- <web-view
-            src="https://m-mall.svw-volkswagen.com/marketing/activity/1684091248959012866?processKey=MF90189799&nodeKey=N1690353629211&utm_term=mp6-13-1"
-    
-        ></web-view> -->
-		<image src="https://brand2.svw-volkswagen.com/cms/prod/I/20230804/f09554dd2d5b39f04636dd31b782aab3.jpg"></image>
+		<view v-if="!location" @click="getLocation()">获取位置</view>
 	</view>
 </template>
 
@@ -12,22 +8,59 @@
 	export default {
 		data() {
 			return {
-				title: 'Hello'
+        		location:false,
 			}
 		},
 		onLoad() {
 
 		},
-		onShareAppMessage() {
-			
+		created(){
+				this.locationInfo()
 		},
 		methods: {
-			
+			getLocation(){
+				this.getLocationInfo()
+			},
+			// 自动定位
+			getLocationInfo() {
+				const that = this
+				console.log("hh")
+				uni.authorize({
+					scope: 'scope.userLocation',
+					success: () => {
+						uni.getLocation({
+							type: 'gcj02',
+							geocode: true,
+							success: (res) => {
+								console.log(res)
+							},
+							fail: (res) => {
+								console.log(res)
+							}, 
+						})
+					},
+					fail(res) {
+						console.log(res)
+					},
+				})
+			},
+			locationInfo(){
+				const that=this;
+				uni.getSetting({
+					success: (res) => {
+						const userLocation = res.authSetting['scope.userLocation']
+            if(userLocation){
+              this.location=true;
+            }
+					}
+				})
+			},
 		}
 	}
 </script>
 
 <style>
+	
 	.content {
 		display: flex;
 		flex-direction: column;
@@ -35,19 +68,5 @@
 		justify-content: center;
 	}
 
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin: 200rpx auto 50rpx auto;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
 </style>
+
